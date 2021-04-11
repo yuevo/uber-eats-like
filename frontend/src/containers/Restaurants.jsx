@@ -74,13 +74,12 @@ export const Restaurants = () => {
     dispatch({ type: restaurantsActionTyps.FETCHING });
     fetchRestaurants()
     .then((data) =>
-      console.log(data)
-      // dispatch({
-      //   type: restaurantsActionTyps.FETCH_SUCCESS,
-      //   payload: {
-      //     restaurants: data.restaurants
-      //   }
-      // })
+      dispatch({
+        type: restaurantsActionTyps.FETCH_SUCCESS,
+        payload: {
+          restaurants: data.restaurants
+        }
+      })
     )
   }, [])
 
