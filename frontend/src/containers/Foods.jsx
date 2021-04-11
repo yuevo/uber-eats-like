@@ -1,15 +1,12 @@
-import React, { Fragment, useReducer, useEffect, useState } from 'react';
+import React, { Fragment,  useReducer, useEffect ,useState } from 'react';
 import styled from 'styled-components';
 import { useHistory, Link } from "react-router-dom";
 
 // components
 import { LocalMallIcon } from '../components/Icons';
 import { FoodWrapper } from '../components/FoodWrapper';
-import Skeleton from '@material-ui/lab/Skeleton';
-import { FoodOrderDialog } from '../components/FoodOrderDialog';
 import { NewOrderConfirmDialog } from '../components/NewOrderConfirmDialog';
-import { postLineFoods, replaceLineFoods } from '../apis/line_foods';
-import { HTTP_STATUS_CODE } from '../constants';
+import Skeleton from '@material-ui/lab/Skeleton';
 
 // reducers
 import {
@@ -20,12 +17,15 @@ import {
 
 // apis
 import { fetchFoods } from '../apis/foods';
+import { postLineFoods, replaceLineFoods } from '../apis/line_foods';
 
 // images
 import MainLogo from '../images/logo.png';
+import { FoodOrderDialog } from '../components/FoodOrderDialog';
 import FoodImage from '../images/food-image.jpg';
 
 // constants
+import { HTTP_STATUS_CODE } from '../constants';
 import { COLORS } from '../style_constants';
 import { REQUEST_STATE } from '../constants';
 
@@ -58,17 +58,9 @@ const ItemWrapper = styled.div`
   margin: 16px;
 `;
 
-const submitOrder = () => {
-  // 後ほど仮注文のAPIを実装します
-  console.log('登録ボタンが押された！')
-}
-
-
 export const Foods = ({
   match
 }) => {
-  const [foodsState, dispatch] = useReducer(foodsReducer, foodsInitialState);
-  const history = useHistory();
   const initialState = {
     isOpenOrderDialog: false,
     selectedFood: null,
@@ -77,6 +69,23 @@ export const Foods = ({
     existingRestaurantName: '',
     newRestaurantName: '',
   };
+  const [state, setState] = useState(initialState);
+  const [foodsState, dispatch] = useReducer(foodsReducer, foodsInitialState);
+  const history = useHistory();
+
+  useEffect(() => {
+    dispatch({ type: foodsActionTyps.FETCHING });
+    fetchFoods(match.params.restaurantsId)
+      .then((data) => {
+        dispatch({
+          type: foodsActionTyps.FETCH_SUCCESS,
+          payload: {
+            foods: data.foods
+          }
+        });
+      })
+  }, []);
+
   const submitOrder = () => {
     postLineFoods({
       foodId: state.selectedFood.id,
@@ -96,28 +105,13 @@ export const Foods = ({
         }
       })
   };
+
   const replaceOrder = () => {
     replaceLineFoods({
       foodId: state.selectedFood.id,
       count: state.selectedFoodCount,
     }).then(() => history.push('/orders'))
-  };
-
-
-  const [state, setState] = useState(initialState);
-
-  useEffect(() => {
-    dispatch({ type: foodsActionTyps.FETCHING });
-    fetchFoods(match.params.restaurantsId)
-      .then((data) => {
-        dispatch({
-          type: foodsActionTyps.FETCH_SUCCESS,
-          payload: {
-            foods: data.foods
-          }
-        });
-      })
-  }, []);
+  }
 
   return (
     <Fragment>
@@ -151,8 +145,8 @@ export const Foods = ({
                   onClickFoodWrapper={
                     (food) => setState({
                       ...state,
-                      isOpenOrderDialog: true,
                       selectedFood: food,
+                      isOpenOrderDialog: true,
                     })
                   }
                   imageUrl={FoodImage}
@@ -162,7 +156,7 @@ export const Foods = ({
         }
       </FoodsList>
       {
-      state.isOpenOrderDialog &&
+        state.isOpenOrderDialog &&
         <FoodOrderDialog
           isOpen={state.isOpenOrderDialog}
           food={state.selectedFood}
@@ -175,9 +169,7 @@ export const Foods = ({
             ...state,
             selectedFoodCount: state.selectedFoodCount - 1,
           })}
-          // 先ほど作った関数を渡します
           onClickOrder={() => submitOrder()}
-          // モーダルを閉じる時はすべてのstateを初期化する
           onClose={() => setState({
             ...state,
             isOpenOrderDialog: false,
@@ -187,7 +179,7 @@ export const Foods = ({
         />
       }
       {
-      state.isOpenNewOrderDialog &&
+        state.isOpenNewOrderDialog &&
         <NewOrderConfirmDialog
           isOpen={state.isOpenNewOrderDialog}
           onClose={() => setState({ ...state, isOpenNewOrderDialog: false })}
