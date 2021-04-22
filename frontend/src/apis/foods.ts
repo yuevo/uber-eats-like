@@ -2,7 +2,7 @@ import axios from 'axios';
 import { foodsIndex } from '../urls/index'
 import { lineFoods, lineFoodsReplace } from '../urls/index'
 
-export const fetchFoods =(restaurantId) => {
+export const fetchFoods =(restaurantId: any) => {
   return axios.get(foodsIndex(restaurantId))
   .then(res => {
     return res.data
@@ -10,7 +10,7 @@ export const fetchFoods =(restaurantId) => {
   .catch((e) => console.error(e))
 }
 
-export const replaceLineFoods = (params) => {
+export const replaceLineFoods = (params: any) => {
   return axios.put(lineFoodsReplace,
     {
       food_id: params.foodId,

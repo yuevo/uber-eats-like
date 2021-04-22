@@ -2,7 +2,7 @@ import axios from 'axios';
 import { lineFoods, lineFoodsReplace } from '../urls/index'
 
 
-export const postLineFoods =(params) => {
+export const postLineFoods =(params: any) => {
   return axios.post(lineFoods,
     {
       food_id: params.foodId,
@@ -15,7 +15,7 @@ export const postLineFoods =(params) => {
   .catch((e) => { throw e; })
 };
 
-export const replaceLineFoods = (params) => {
+export const replaceLineFoods = (params: any) => {
   return axios.put(lineFoodsReplace,
     {
       food_id: params.foodId,
